@@ -1,0 +1,16 @@
+services:
+  mysql:
+    image: mysql:8.0-debian
+    container_name: mysql-demo
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: demo-spring
+    ports:
+      - "3306:3306"
+    command: --default-time-zone='+07:00'
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
