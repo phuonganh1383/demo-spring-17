@@ -2,6 +2,7 @@ package com.example.demoSpring17.services;
 
 import com.example.demoSpring17.dto.requestDto.IntrospectRequest;
 import com.example.demoSpring17.dto.responseDto.IntrospectResponse;
+import com.example.demoSpring17.models.User;
 import com.example.demoSpring17.repository.UserRepository;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -63,20 +64,20 @@ public class AuthenticationService {
     if (!matches) {
       throw new RuntimeException("Authentication failed");
     }
-    return generateToken(username);
+    return generateToken(user);
   }
 
-  private String generateToken(String username) {
+  private String generateToken(User user) {
     // Logic to generate JWT or any other token
     JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
 
     JWTClaimsSet claims = new JWTClaimsSet.Builder()
-        .subject(username)
+        .subject(user.getUsername())
         .issuer("demoSpring17")
             .issueTime(new Date())
             .expirationTime(new Date(Instant.now()
                     .plus(1, ChronoUnit.HOURS).toEpochMilli()))
-            .claim("customClaim", "custom")
+            .claim("scope", buildScope(user))
         .build();
 
     Payload payload = new Payload(claims.toJSONObject());
@@ -88,6 +89,13 @@ public class AuthenticationService {
     } catch (JOSEException e) {
         throw new RuntimeException("Error generating token", e);
     }
+  }
 
+  private String buildScope(User user) {
+    // Logic to build scope based on user roles/permissions
+    if (user.getRole() != null) {
+      return user.getRole().name();
+    }
+    return "custom";
   }
 }

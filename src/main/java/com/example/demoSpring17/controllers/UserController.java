@@ -8,7 +8,9 @@ import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +25,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
+@Slf4j
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
 
@@ -42,6 +45,10 @@ public class UserController {
   // --- 2. READ (GET All) ---
   @GetMapping
   public List<User> getAllUsers() {
+    var authentication = SecurityContextHolder.getContext().getAuthentication();
+    log.info("username: {}", authentication.getName());
+    authentication.getAuthorities()
+            .forEach(grant -> log.info("grant: {}", grant.getAuthority()));
     return userService.getAllUsers();
   }
 
